@@ -31,7 +31,7 @@ exports.loginUser = asyncHandler(async (req, res, next) => {
   //check if fields are empty
   if (!username || !password) return next(new ErrorResponse("Please enter username and password", 401));
 
-  //check if email address match
+  //check if  username match
   const user = await User.findOne({ username }).select("+password");
   if (!user) return next(new ErrorResponse("Invalid Username or Password", 401));
 
@@ -71,6 +71,30 @@ const sendTokenResponse = (user, statusCode, res) => {
 // @access Public
 exports.getAllSellers = asyncHandler(async (req, res, next) => {
   const sellers = await User.find({ typeOfUser: "seller" });
+
+  res.status(200).json({ data: sellers });
+});
+
+// @Desc Get the nearest Sellers
+// @Route GET /api/v1/users/getNearestSellers?:longitude&:latitude&:maxDistance
+// @access Public
+exports.getNearestSellers = asyncHandler(async (req, res, next) => {
+  const longitude = req.query.longitude;
+  const latitude = req.query.latitude;
+  const maxDistance = req.query.maxDistance;
+
+  //Calculate radius
+  ///Divide maxDistance provided BY earth's radius
+  // earth's radius is 6,378 km
+  const radius = maxDistance / 6378;
+
+  //Search the database with the calculated params
+  const sellers = await User.find({
+    typeOfUser: "seller",
+    location: {
+      $geoWithin: { $centerSphere: [[longitude, latitude], radius] }
+    }
+  });
 
   res.status(200).json({ data: sellers });
 });
