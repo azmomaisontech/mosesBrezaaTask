@@ -43,18 +43,9 @@ exports.loginUser = asyncHandler(async (req, res, next) => {
   sendTokenResponse(user, 200, res);
 });
 
-//Send cookie and user data to the Client
+//Send token and user data to the Client
 const sendTokenResponse = (user, statusCode, res) => {
   const token = user.getSignedJwtToken();
-
-  const options = {
-    expires: new Date(Date.now() + process.env.JWT_COOKIE_EXP * 24 * 60 * 60 * 1000),
-    httpOnly: true
-  };
-
-  if (process.env.NODE_ENV === "production") {
-    options.secure = true;
-  }
 
   const data = {
     id: user._id,
@@ -69,13 +60,10 @@ const sendTokenResponse = (user, statusCode, res) => {
     latitude: user.location.coordinates[1]
   };
 
-  res
-    .status(statusCode)
-    .cookie("token", token, options)
-    .json({
-      data,
-      token
-    });
+  res.status(statusCode).json({
+    data,
+    token
+  });
 };
 
 // @Desc Get all Sellers
@@ -84,5 +72,5 @@ const sendTokenResponse = (user, statusCode, res) => {
 exports.getAllSellers = asyncHandler(async (req, res, next) => {
   const sellers = await User.find({ typeOfUser: "seller" });
 
-  res.status(200).send(sellers);
+  res.status(200).json({ data: sellers });
 });

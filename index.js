@@ -1,10 +1,9 @@
 const express = require("express");
+const app = express();
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
-const app = express();
-const cookieParser = require("cookie-parser");
 const userRouter = require("./routes/users");
-
+const reviewRouter = require("./routes/reviews");
 const errorHandler = require("./middleware/error");
 
 //load al config var
@@ -16,11 +15,9 @@ connectDB();
 //Body parser
 app.use(express.json());
 
-//Cookie Parser
-app.use(cookieParser());
-
 // Mount Routers
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/review", reviewRouter);
 
 //Load errorHandler
 app.use(errorHandler);
