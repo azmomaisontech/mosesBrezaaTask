@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const geocoder = require("../utils/geocoder");
 
 const UserSchema = new mongoose.Schema({
   email: {
@@ -54,7 +55,7 @@ const UserSchema = new mongoose.Schema({
 });
 
 //To hash a password before saving
-UserSchema.pre("save", async function(next) {
+UserSchema.pre("save", async function() {
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
@@ -70,5 +71,16 @@ UserSchema.methods.getSignedJwtToken = function() {
 UserSchema.methods.comparePassword = async function(enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
+
+//GeoCoder
+UserSchema.pre("save", async function(next) {
+  const loc = await geocoder.geocode(this.address);
+  this.location = {
+    type: "Point",
+    coordinates: [loc[0].longiture, loc[0].latitude]
+  };
+
+  next();
+});
 
 module.exports = mongoose.model("User", UserSchema);
