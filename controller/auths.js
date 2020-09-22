@@ -22,6 +22,27 @@ exports.registerUser = asyncHandler(async (req, res, next) => {
   sendTokenResponse(user, 201, res);
 });
 
+// @Desc Login a new User
+// @Route POST  /api/v1/auth/login
+// @access Public
+exports.loginUser = asyncHandler(async (req, res, next) => {
+  const { username, password } = req.body;
+
+  //check if fields are empty
+  if (!username || !password) return next(new ErrorResponse("Please enter username and password", 401));
+
+  //check if email address match
+  const user = await User.findOne({ username }).select("+password");
+  if (!user) return next(new ErrorResponse("Invalid Username or Password", 401));
+
+  // check if password match
+  const isMatch = await user.comparePassword(password);
+  if (!isMatch) return next(new ErrorResponse("Invalid Username or Password", 401));
+
+  // If request passes every validation
+  sendTokenResponse(user, 200, res);
+});
+
 //Send cookie and user data to the Client
 const sendTokenResponse = (user, statusCode, res) => {
   const token = user.getSignedJwtToken();
@@ -35,12 +56,24 @@ const sendTokenResponse = (user, statusCode, res) => {
     options.secure = true;
   }
 
+  const data = {
+    id: user._id,
+    email: user.email,
+    username: user.username,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    address: user.address,
+    typeOfUser: user.typeOfUser,
+    profession: user.profession,
+    longitude: user.location.coordinates[0],
+    latitude: user.location.coordinates[1]
+  };
+
   res
     .status(statusCode)
     .cookie("token", token, options)
     .json({
-      success: true,
-      data: user,
+      data,
       token
     });
 };
