@@ -3,7 +3,7 @@ const asyncHandler = require("../middleware/async");
 const ErrorResponse = require("../utils/errorResponse");
 
 // @Desc Register a new User
-// @Route POST /api/v1/auth/regsiter
+// @Route POST /api/v1/users/signup
 // @access Public
 exports.registerUser = asyncHandler(async (req, res, next) => {
   const { email, password, username, firstName, lastName, address, typeOfUser, profession } = req.body;
@@ -23,7 +23,7 @@ exports.registerUser = asyncHandler(async (req, res, next) => {
 });
 
 // @Desc Login a new User
-// @Route POST  /api/v1/auth/login
+// @Route POST  /api/v1/users/login
 // @access Public
 exports.loginUser = asyncHandler(async (req, res, next) => {
   const { username, password } = req.body;
@@ -77,3 +77,12 @@ const sendTokenResponse = (user, statusCode, res) => {
       token
     });
 };
+
+// @Desc Get all Sellers
+// @Route GET /api/v1/users/getAllSellers
+// @access Public
+exports.getAllSellers = asyncHandler(async (req, res, next) => {
+  const sellers = await User.find({ typeOfUser: "seller" });
+
+  res.status(200).send(sellers);
+});

@@ -3,7 +3,8 @@ const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const app = express();
 const cookieParser = require("cookie-parser");
-const authRouter = require("./routes/auths");
+const userRouter = require("./routes/users");
+
 const errorHandler = require("./middleware/error");
 
 //load al config var
@@ -19,7 +20,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Mount Routers
-app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/users", userRouter);
 
 //Load errorHandler
 app.use(errorHandler);
