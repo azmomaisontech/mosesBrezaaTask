@@ -75,15 +75,16 @@ exports.getAllSellers = asyncHandler(async (req, res, next) => {
   res.status(200).json({ data: sellers });
 });
 
-// @Desc Get the nearest Sellers
+// @Desc Get the nearest Sellers by a certain distance
 // @Route GET /api/v1/users/getNearestSellers?:longitude&:latitude&:maxDistance
 // @access Public
 exports.getNearestSellers = asyncHandler(async (req, res, next) => {
+  //Fetch the coordinates and the maximum distance from the request query
   const longitude = req.query.longitude;
   const latitude = req.query.latitude;
   const maxDistance = req.query.maxDistance;
 
-  //Calculate radius
+  //Calculate radius to find the closest distance
   ///Divide maxDistance provided BY earth's radius
   // earth's radius is 6,378 km
   const radius = maxDistance / 6378;

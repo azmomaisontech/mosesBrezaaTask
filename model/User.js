@@ -60,7 +60,7 @@ UserSchema.pre("save", async function() {
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-//To return a JWT to the client after sign up/in
+//To return a Token to the client after sign up/in
 UserSchema.methods.getSignedJwtToken = function() {
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE

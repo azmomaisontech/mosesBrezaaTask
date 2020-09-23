@@ -5,7 +5,7 @@ const User = require("../model/User");
 
 //@desc      Add a Review
 //@route     POST /api/v1/review/?:sellerId/
-//@access    Private/Admin/User
+//@access    Private/User-Client only
 exports.addReview = asyncHandler(async (req, res, next) => {
   req.body.seller = req.query.sellerId;
   req.body.user = req.user.id;
